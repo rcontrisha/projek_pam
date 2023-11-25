@@ -47,6 +47,7 @@ class _HomePageState extends State<HomePage> {
       // Handle error, show a message to the user, or retry the request
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
