@@ -6,9 +6,8 @@ import 'Models/feedback_model.dart';
 
 void main() async{
   await Hive.initFlutter();
-
-  // Register the Hive adapters here
   Hive.registerAdapter(FeedbackModelAdapter());
+  await Hive.openBox<FeedbackModel>('feedbackBox');
 
   runApp(const MyApp());
 }

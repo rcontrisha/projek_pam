@@ -15,12 +15,6 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   late int _currentIndex = 3;
-  final List<Widget> _screens = [
-    HomePage(),
-    Convert(),
-    FeedbackForm(),
-    ProfilePage(),
-  ];
 
   Future<void> _logout() async {
     // Clear the username from shared preferences
@@ -57,12 +51,12 @@ class _ProfilePageState extends State<ProfilePage> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.only(top: 15),
+        padding: const EdgeInsets.only(top: 10),
         child: Align(
           alignment: Alignment.topCenter,
           child: Container(
-            height: 450,
-            width: 400,
+            height: 420,
+            width: 380,
             child: Card(
               color: Colors.blueGrey[200],
               child: Column(
@@ -71,7 +65,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Container(
-                      margin: EdgeInsets.symmetric(vertical: 10.0),
+                      margin: EdgeInsets.symmetric(vertical: 5.0),
                       child: ClipOval(
                         child: Image.asset(
                           'assets/foto.jpg',

@@ -14,12 +14,6 @@ class Convert extends StatefulWidget {
 
 class _ConvertState extends State<Convert> {
   int _currentIndex = 1;
-  final List<Widget> _screens = [
-    HomePage(),
-    Convert(),
-    FeedbackForm(),
-    ProfilePage(),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -45,8 +39,8 @@ class _ConvertState extends State<Convert> {
                 Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => CurrencyConverter()));
               },
               child: Container(
-                height: 200,
-                width: 200,
+                height: 190,
+                width: 190,
                 child: Card(
                   color: Colors.pinkAccent[100],
                   child: Padding(
@@ -74,14 +68,14 @@ class _ConvertState extends State<Convert> {
                 ),
               ),
             ),
-            SizedBox(width: 10),
+            SizedBox(width: 5),
             InkWell(
               onTap: () {
                 Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => TimeConverter()));
               },
               child: Container(
-                height: 200,
-                width: 200,
+                height: 190,
+                width: 190,
                 child: Card(
                   color: Colors.pinkAccent[100],
                   child: Column(

@@ -4,6 +4,7 @@ import '../Pages/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import '../Pages/home.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class FeedbackForm extends StatefulWidget {
   @override
@@ -12,12 +13,6 @@ class FeedbackForm extends StatefulWidget {
 
 class _FeedbackFormState extends State<FeedbackForm> {
   late int _currentIndex = 2;
-  final List<Widget> _screens = [
-    HomePage(),
-    Convert(),
-    FeedbackForm(),
-    ProfilePage(),
-  ];
 
   final TextEditingController _saranController = TextEditingController();
   final TextEditingController _kesanController = TextEditingController();
@@ -37,82 +32,124 @@ class _FeedbackFormState extends State<FeedbackForm> {
         centerTitle: true,
         automaticallyImplyLeading: false,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Saran:',
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[600]
-              ),
-            ),
-            TextField(
-              controller: _saranController,
-              maxLines: 3,
-              decoration: InputDecoration(
-                hintText: 'Masukkan saran Anda...',
-                border: OutlineInputBorder(),
-                hintStyle: TextStyle(
-                    color: Colors.grey[600]
-                ),
-                enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey[600]!)
-                ),
-                focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey[600]!)
-                ),
-              ),
-              cursorColor: Colors.grey[600],
-            ),
-            SizedBox(height: 16.0),
-            Text(
-              'Kesan:',
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[600]
-              ),
-            ),
-            TextField(
-              controller: _kesanController,
-              maxLines: 3,
-              decoration: InputDecoration(
-                  hintText: 'Masukkan kesan Anda...',
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey[600]!)
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey[600]!)
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey[600]!)
-                  ),
-                  hintStyle: TextStyle(
-                      color: Colors.grey[600]
-                  )
-              ),
-              cursorColor: Colors.grey[600],
-            ),
-            SizedBox(height: 24.0),
-            ElevatedButton(
-              onPressed: () {
-                submitFeedback();
-              },
-              child: Text(
-                  'Kirim',
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Container(
+            height: MediaQuery.of(context).size.height,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'Saran:',
                   style: TextStyle(
-                    color: Colors.white
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[600]
                   ),
-              ),
-              style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(Colors.pinkAccent[100]!)
-              ),
+                ),
+                TextField(
+                  controller: _saranController,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    hintText: 'Masukkan saran Anda...',
+                    border: OutlineInputBorder(),
+                    hintStyle: TextStyle(
+                        color: Colors.grey[600]
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey[600]!)
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey[600]!)
+                    ),
+                  ),
+                  cursorColor: Colors.grey[600],
+                ),
+                SizedBox(height: 16.0),
+                Text(
+                  'Kesan:',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[600]
+                  ),
+                ),
+                TextField(
+                  controller: _kesanController,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                      hintText: 'Masukkan kesan Anda...',
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey[600]!)
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey[600]!)
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey[600]!)
+                      ),
+                      hintStyle: TextStyle(
+                          color: Colors.grey[600]
+                      )
+                  ),
+                  cursorColor: Colors.grey[600],
+                ),
+                SizedBox(height: 24.0),
+                ElevatedButton(
+                  onPressed: () {
+                    submitFeedback();
+                  },
+                  child: Text(
+                      'Kirim',
+                      style: TextStyle(
+                        color: Colors.white
+                      ),
+                  ),
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(Colors.pinkAccent[100]!)
+                  ),
+                ),
+                SizedBox(height: 50),
+                Text(
+                  'Saran & Kesan',
+                  style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold
+                  ),
+                ),
+                Expanded(
+                  child: ValueListenableBuilder(
+                    valueListenable: Hive.box<FeedbackModel>('feedbackBox').listenable(),
+                    builder: (BuildContext context, Box<FeedbackModel> box, _) {
+                      if (box.values.isEmpty) {
+                        return Center(
+                          child: Text('Feedback is empty.'),
+                        );
+                      }
+                      return ListView.builder(
+                        itemCount: box.values.length,
+                        itemBuilder: (context, index) {
+                          FeedbackModel? feedback = box.getAt(index);
+                          return Card(
+                            elevation: 3,
+                            color: Colors.pink[100],
+                            margin: EdgeInsets.all(6),
+                            child: ListTile(
+                              leading: Icon(Icons.chat_outlined),
+                              title: Text('Kesan: ${feedback?.kesan}'),
+                              subtitle: Text('Saran: ${feedback?.saran}'),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                )
+              ],
             ),
-          ],
+          ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -169,22 +206,25 @@ class _FeedbackFormState extends State<FeedbackForm> {
 
   void submitFeedback() async {
     try {
-      // Buka Hive box untuk feedback
       var feedbackBox = await Hive.openBox<FeedbackModel>('feedbackBox');
 
-      // Buat objek FeedbackModel dari data yang dimasukkan
       FeedbackModel feedback = FeedbackModel(
         saran: _saranController.text,
         kesan: _kesanController.text,
       );
 
-      // Simpan objek FeedbackModel ke dalam Hive box
       await feedbackBox.add(feedback);
 
-      // Tampilkan pesan sukses atau lakukan sesuatu yang lain
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Pesan berhasil disubmit.'),
+            backgroundColor: Colors.green,
+          )
+      );
       print('Feedback berhasil disimpan ke dalam Hive box.');
+      _saranController.clear();
+      _kesanController.clear();
     } catch (e) {
-      // Handle error jika ada
       print('Error: $e');
     }
   }

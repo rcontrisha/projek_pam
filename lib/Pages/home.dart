@@ -16,12 +16,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
-  final List<Widget> _screens = [
-    HomePage(),
-    Convert(),
-    FeedbackForm(),
-    ProfilePage()
-  ];
 
   final SportsApiClient sportsApiClient =
   SportsApiClient();
@@ -36,8 +30,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> fetchData() async {
     try {
       final data = await sportsApiClient.fetchData();
-      final teamModel =
-      TeamModel.fromJson(data); // Assuming you have a TeamModel model class
+      final teamModel = TeamModel.fromJson(data); // Assuming you have a TeamModel model class
 
       setState(() {
         teams = teamModel.teams ?? [];

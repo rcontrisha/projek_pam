@@ -12,13 +12,6 @@ class CurrencyConverter extends StatefulWidget {
 
 class _CurrencyConverterState extends State<CurrencyConverter> {
   int _currentIndex = 1;
-  final List<Widget> _screens = [
-    HomePage(),
-    Convert(),
-    FeedbackForm(),
-    ProfilePage(),
-    // Add your Log Out screen here
-  ];
 
   TextEditingController amountController = TextEditingController();
   String selectedFromCurrency = 'USD';
