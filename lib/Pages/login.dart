@@ -26,7 +26,7 @@ class _LoginPageState extends State<LoginPage> {
 
   checkLoginStatus() async {
     sharedPreferences = await SharedPreferences.getInstance();
-    newUser = (sharedPreferences.getBool('login') ?? true); // Add "?"
+    newUser = (sharedPreferences.getBool('login') ?? true);
     print(newUser);
     if (newUser == false) {
       Navigator.push(
@@ -34,13 +34,10 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  String calculateMD5(String input) {
-    return md5.convert(utf8.encode(input)).toString();
-  }
-
-  void printHashForAdminPassword() {
-    String hashedPassword = calculateMD5('admin');
-    print('Hashed Password for Admin: $hashedPassword');
+  String calculateSHA256(String input) {
+    var bytes = utf8.encode(input); // Encode the input string as UTF-8
+    var digest = sha256.convert(bytes); // Calculate the SHA-256 hash
+    return digest.toString(); // Convert the hash to a string
   }
 
   @override
@@ -150,27 +147,36 @@ class _LoginPageState extends State<LoginPage> {
                   child: ElevatedButton(
                     onPressed: () {
                       sharedPreferences.setBool('login', false);
-                      sharedPreferences.setString(
-                          'username', _usernameController.text);
-                      if (_usernameController.text == 'admin' &&
-                          _passwordController.text == 'admin') {
-                        printHashForAdminPassword();
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => HomePage()));
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text('Login Success'),
-                          backgroundColor: Colors.green,
-                        ));
+                      sharedPreferences.setString('username', _usernameController.text);
+
+                      String enteredPasswordHash = calculateSHA256(_passwordController.text);
+                      String storedPasswordHash = calculateSHA256('admin');
+
+                      if (_usernameController.text == 'admin' && _passwordController.text == 'admin') {
+
+                        if (enteredPasswordHash == storedPasswordHash) {
+                          print('Entered Password Hash: $enteredPasswordHash');
+                          print('Stored Password Hash: $storedPasswordHash');
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => HomePage())
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Login Success'),
+                                backgroundColor: Colors.green,
+                              )
+                          );
+                        }
                       } else {
-                        String hashedPassword =
-                        calculateMD5(_passwordController.text);
-                        print('Hashed Password: $hashedPassword');
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text('Login Failed'),
-                          backgroundColor: Colors.red,
-                        ));
+                        print('Entered Password Hash: $enteredPasswordHash');
+                        print('Stored Password Hash: $storedPasswordHash');
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Login Failed'),
+                              backgroundColor: Colors.red,
+                            )
+                        );
                       }
                     },
                     child: Text(

@@ -36,7 +36,6 @@ class _HomePageState extends State<HomePage> {
       });
     } catch (e) {
       print('Error fetching data: $e');
-      // Handle error, show a message to the user, or retry the request
     }
   }
 

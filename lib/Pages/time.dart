@@ -15,16 +15,20 @@ class TimeConverter extends StatefulWidget {
 class _TimeConverterState extends State<TimeConverter> {
   int _currentIndex = 1;
 
-  late DateTime _currentTime; // Declare as late so it can be initialized in initState
+  late DateTime _currentTime;
   DateTime _selectedTime = DateTime.now();
-  String _selectedTimeZone = 'WIB'; // Initial dropdown value
+  String _selectedTimeZone = 'GMT';
 
   String _formatTime(DateTime time, String timeZone) {
-    return DateFormat('HH:mm:ss', 'en_US')
-        .add_jm()
+    String runningTime = DateFormat('HH:mm:ss', 'en_US')
         .format(time.toUtc())
-        .toString() +
-        ' $timeZone';
+        .toString();
+
+    String amPmTime = DateFormat('h:mm a', 'en_US')
+        .format(time.toUtc())
+        .toString();
+
+    return '$runningTime\n$amPmTime $timeZone';
   }
 
   @override
@@ -32,9 +36,27 @@ class _TimeConverterState extends State<TimeConverter> {
     super.initState();
     // Initialize _currentTime and start the timer
     _currentTime = DateTime.now();
+
     Timer.periodic(Duration(seconds: 1), (Timer timer) {
       setState(() {
         _currentTime = DateTime.now();
+      });
+    });
+
+    Timer.periodic(Duration(seconds: 1), (Timer timer) {
+      setState(() {
+        // Update _selectedTime based on the selected time zone
+        if (_selectedTimeZone == 'GMT') {
+          _selectedTime = _currentTime;
+        } else if (_selectedTimeZone == 'WIB') {
+          _selectedTime = _currentTime.toUtc().add(Duration(hours: 7));
+        } else if (_selectedTimeZone == 'WITA') {
+          _selectedTime = _currentTime.toUtc().add(Duration(hours: 8));
+        } else if (_selectedTimeZone == 'WIT') {
+          _selectedTime = _currentTime.toUtc().add(Duration(hours: 9));
+        } else if (_selectedTimeZone == 'London') {
+          _selectedTime = _currentTime.toUtc();
+        }
       });
     });
   }
@@ -68,11 +90,24 @@ class _TimeConverterState extends State<TimeConverter> {
                   ),
                 ),
                 SizedBox(height: 16),
-                Text(
-                  _formatTime(_currentTime, 'GMT'),
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.white,
+                Center(
+                  child: Column(
+                    children: [
+                      Text(
+                        _formatTime(_selectedTime, _selectedTimeZone).split('\n')[0],
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        _formatTime(_selectedTime, _selectedTimeZone).split('\n')[1],
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(height: 32),
@@ -88,12 +123,12 @@ class _TimeConverterState extends State<TimeConverter> {
                       } else if (value == 'WIT') {
                         _selectedTime = _currentTime.toUtc().add(Duration(hours: 9));
                       } else if (value == 'London') {
-                        _selectedTime = _currentTime.toUtc(); // Set London time as UTC
+                        _selectedTime = _currentTime.toUtc();
                       }
                       _selectedTimeZone = value!;
                     });
                   },
-                  items: ['WIB', 'WITA', 'WIT', 'London'].map<DropdownMenuItem<String>>(
+                  items: ['GMT', 'WIB', 'WITA', 'WIT', 'London'].map<DropdownMenuItem<String>>(
                         (String value) {
                       return DropdownMenuItem<String>(
                         value: value,
@@ -106,23 +141,7 @@ class _TimeConverterState extends State<TimeConverter> {
                   ).toList(),
                   style: TextStyle(color: Colors.white),
                   dropdownColor: Colors.pink[300],
-                ),
-                SizedBox(height: 32),
-                Text(
-                  'Waktu yang dipilih:',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 16),
-                Text(
-                  _formatTime(_selectedTime, _selectedTimeZone),
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.white,
-                  ),
+                  iconEnabledColor: Colors.white,
                 ),
               ],
             ),
